@@ -1,16 +1,11 @@
 import os
 import time
+import chromadb
+from langchain_openai import OpenAIEmbeddings
+from scraper import get_article_links, scrape_article_content
 from dotenv import load_dotenv
 
-# Load environment variables from the .env file
 load_dotenv()
-
-# Use the updated import for OpenAIEmbeddings per deprecation warning.
-from langchain_community.embeddings import OpenAIEmbeddings
-
-import chromadb
-# Import the scraping functions from scraper.py
-from scraper import get_article_links, scrape_article_content
 
 def scrape_articles_content():
     """
@@ -50,8 +45,7 @@ embedding_model = OpenAIEmbeddings(
     model="text-embedding-3-small"
 )
 
-# Set up the ChromaDB client using the new instantiation (in-memory for testing)
-client = chromadb.Client()
+client = chromadb.PersistentClient(path="./chroma_db")
 
 # Create or get an existing collection to store the articles
 collection = client.get_or_create_collection(name="articles")
@@ -79,3 +73,4 @@ collection.add(
 )
 
 print("Embeddings generated in batch and stored in ChromaDB!")
+
