@@ -7,15 +7,13 @@ from openai import OpenAI
 import os
 from dotenv import load_dotenv
 
-# Load environment variables
 load_dotenv()
 
-# Initialize FastAPI app
 app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allow requests from any origin. Replace "*" with your frontend URL for better security.
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -110,11 +108,10 @@ Based on these articles, please answer this question:
 Remember to cite sources and explain any connections you make between different pieces of information."""}
         ]
         
-        # Generate answer using ChatGPT
         chat_response = openai_client.chat.completions.create(
             model="gpt-4o-mini",
             messages=messages,
-            temperature=0.2  # Slightly increased for more natural responses while maintaining accuracy
+            temperature=0.2
         )
         
         answer = chat_response.choices[0].message.content

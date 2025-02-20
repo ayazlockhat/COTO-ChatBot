@@ -8,3 +8,5 @@ uvicorn
 python-dotenv
 langchain-community
 tiktoken
+pypdf2
+langchain-openai

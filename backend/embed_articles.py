@@ -8,10 +8,6 @@ from dotenv import load_dotenv
 load_dotenv()
 
 def scrape_articles_content():
-    """
-    Retrieve all article links from the listing page and then scrape each article.
-    Returns a list of articles, where each article is a dict with keys: "title", "url", and "content".
-    """
     listing_url = (
         "https://www.coto.org/resources/?lang=en&view=grid&term=&resource-audience=&"
         "resource-topic=&resource-type=practice-guidance"
@@ -27,19 +23,15 @@ def scrape_articles_content():
             articles.append(article)
         except Exception as e:
             print(f"Error scraping {link}: {e}")
-        # Pause briefly to avoid overloading the server
         time.sleep(1)
     return articles
 
-# Get articles using the wrapper function
 articles = scrape_articles_content()
 
-# Ensure your OpenAI API key is set in your environment variables
 openai_api_key = os.environ.get("OPENAI_API_KEY")
 if not openai_api_key:
     raise Exception("OPENAI_API_KEY not set in environment variables.")
 
-# Initialize the OpenAI embeddings model using the cheapest model
 embedding_model = OpenAIEmbeddings(
     openai_api_key=openai_api_key,
     model="text-embedding-3-small"
@@ -47,13 +39,11 @@ embedding_model = OpenAIEmbeddings(
 
 client = chromadb.PersistentClient(path="./chroma_db")
 
-# Create or get an existing collection to store the articles
 collection = client.get_or_create_collection(name="articles")
 
-# Prepare lists for batch processing
-documents = []   # Combined title + content for each article
-metadatas = []   # Metadata for each article
-ids = []         # Using the URL as a unique identifier
+documents = []
+metadatas = []
+ids = []
 
 for article in articles:
     text_to_embed = f"{article['title']}\n\n{article['content']}"
@@ -61,15 +51,13 @@ for article in articles:
     metadatas.append({"title": article['title'], "url": article['url']})
     ids.append(article['url'])
 
-# Generate embeddings for all documents in one batch call
 embeddings = embedding_model.embed_documents(documents)
 
-# Add all documents to ChromaDB in one batch
 collection.add(
     documents=documents,
     embeddings=embeddings,
     metadatas=metadatas,
-    ids=ids  # using the URL as a unique identifier
+    ids=ids
 )
 
 print("Embeddings generated in batch and stored in ChromaDB!")
