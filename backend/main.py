@@ -68,7 +68,8 @@ async def chat(query: Query):
             distance = results['distances'][0][i]
             
             # Add to context with source marker
-            context_texts.append(f"[Source {i+1}: {metadata['title']}]\n{article_content}")
+            context_texts.append(f"[Source {i+1}: {metadata['title']} - {article_id}]\n{article_content}")
+
             
             # Add to relevant articles list
             relevant_articles.append(Article(
@@ -80,19 +81,16 @@ async def chat(query: Query):
         
         # Combine context
         context = "\n\n".join(context_texts)
-        
-        # Updated system message to encourage more helpful responses
-        system_message = """You are a helpful assistant that provides information based on the available articles. 
-When answering:
-1. If you find directly relevant information, provide it with source references
-2. If you find partially relevant information, explain how it relates to the question
-3. If you find related guidelines or information that might be helpful, share those
-4. Always cite your sources using [Source X] notation and add the sources link to the [Source X] text
-5. Be clear about what information comes from which source
-6. If you make connections between multiple sources, explain your reasoning
-7. At the end, link each source to the top 3 relevant articles
 
-If no relevant information is found, suggest related topics from the articles that might be helpful."""
+        system_message = (
+            "You are a chatbot that must answer questions using only the provided articles. "
+            "Do NOT incorporate any external data."
+            "Always cite your sources using [Source X] notation, where X matches the sources provided."
+            "If there are multiple sources, include multiple citations (e.g., [Source 1, Source 3])."
+            "At the END of your response, provide a reference list in this format:"
+            "'Source X: [Article Title](URL)'. "
+            "If you cannot find direct information, say you can't and provide the top 3 articles that could benefit the user."
+        )
 
         # Create message for ChatGPT
         messages = [
@@ -103,15 +101,13 @@ If no relevant information is found, suggest related topics from the articles th
 -----------------
 
 Based on these articles, please answer this question:
-{query.question}
-
-Remember to cite sources and explain any connections you make between different pieces of information."""}
+{query.question}"""}
         ]
         
         chat_response = openai_client.chat.completions.create(
             model="gpt-4o-mini",
             messages=messages,
-            temperature=0.2
+            temperature=0.0
         )
         
         answer = chat_response.choices[0].message.content
