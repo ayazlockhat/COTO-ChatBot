@@ -19,9 +19,11 @@ export const Overview = () => {
           <MessageCircle size={44}/>
         </p>
         <p>
-          Welcome to <strong>chatbot-ui</strong><br />
-          a open source template made by<br />
-          <strong>Leon Binder</strong> and <strong>Christoph Handschuh</strong>.
+          Welcome to <strong>ChatOTP</strong><br />
+          A chatbot that uses the <a href='https://www.coto.org/resource/practice-guidance/' className="underline">
+          COTO Resources
+          </a> to answer your questions<br />By:
+          <strong> Ayaz Lockhat</strong>
         </p>
       </div>
     </motion.div>

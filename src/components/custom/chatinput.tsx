@@ -4,7 +4,7 @@ import { Button } from "../ui/button";
 import { ArrowUpIcon } from "./icons"
 import { toast } from 'sonner';
 import { motion } from 'framer-motion';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 interface ChatInputProps {
     question: string;
@@ -13,34 +13,74 @@ interface ChatInputProps {
     isLoading: boolean;
 }
 
-const suggestedActions = [
+const allSuggestedActions = [
     {
-        title: 'How is the weather',
-        label: 'in Vienna?',
-        action: 'How is the weather in Vienna today?',
+        title: 'What are my rights?',
+        label: 'as an occupational therapist?',
+        action: 'What are the professional rights and responsibilities of an occupational therapist?',
     },
     {
-        title: 'Tell me a fun fact',
-        label: 'about pandas',
-        action: 'Tell me an interesting fact about pandas',
+        title: 'How do I report concerns?',
+        label: 'about a patient\'s driving?',
+        action: 'As an occupational therapist, when should I report a patient\'s fitness to drive?',
+    },
+    {
+        title: 'Establishing a private practice',
+        label: 'in Ontario',
+        action: 'What are the recommended practices and information for occupational therapists wishing to establish a private practice in Ontario?',
+    },
+    {
+        title: 'Maintaining professional boundaries',
+        label: 'with clients',
+        action: 'How should I maintain professional boundaries with clients to prevent conflicts of interest?',
+    },
+    {
+        title: 'Providing virtual services',
+        label: 'in occupational therapy',
+        action: 'What are the guidelines for providing remote (virtual) occupational therapy services?',
+    },
+    {
+        title: 'Record keeping standards',
+        label: 'for occupational therapists',
+        action: 'What are the standards for record keeping in occupational therapy practice?',
+    },
+    {
+        title: 'Understanding consent',
+        label: 'in occupational therapy',
+        action: 'What are the guidelines for obtaining consent from clients in occupational therapy practice?',
+    },
+    {
+        title: 'Managing conflicts of interest',
+        label: 'in practice',
+        action: 'How should I identify and manage conflicts of interest in my occupational therapy practice?',
     },
 ];
 
 export const ChatInput = ({ question, setQuestion, onSubmit, isLoading }: ChatInputProps) => {
     const [showSuggestions, setShowSuggestions] = useState(true);
+    const [randomizedSuggestions, setRandomizedSuggestions] = useState<typeof allSuggestedActions>([]);
+
+    useEffect(() => {
+        const getRandomSuggestions = () => {
+            const shuffled = [...allSuggestedActions].sort(() => 0.5 - Math.random());
+            return shuffled.slice(0, 2);
+        };
+
+        setRandomizedSuggestions(getRandomSuggestions());
+    }, []);
 
     return(
     <div className="relative w-full flex flex-col gap-4">
         {showSuggestions && (
             <div className="hidden md:grid sm:grid-cols-2 gap-2 w-full">
-                {suggestedActions.map((suggestedAction, index) => (
+                {randomizedSuggestions.map((suggestedAction, index) => (
                     <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: 20 }}
                     transition={{ delay: 0.05 * index }}
                     key={index}
-                    className={index > 1 ? 'hidden sm:block' : 'block'}
+                    className="block"
                     >
                         <Button
                             variant="ghost"
