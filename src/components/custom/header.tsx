@@ -10,8 +10,11 @@ export const Header = () => {
         <ThemeToggle />
       </div>
 
-      <div className="flex-grow flex justify-center">
+      <div className="flex flex-col items-center">
         <span className="font-semibold text-lg">ChatOTP</span>
+        <span className="text-xs text-gray-500 dark:text-gray-400">
+          GPT-4o mini
+        </span>
       </div>
 
       <div className="w-[40px] sm:w-[48px]">
