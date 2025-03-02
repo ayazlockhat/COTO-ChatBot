@@ -7,23 +7,17 @@ RUN apt-get update && apt-get install -y nodejs npm
 # Set the working directory inside the container
 WORKDIR /app
 
-### ---- BACKEND SETUP ---- ###
-# Copy only the backend dependencies first (for efficient caching)
-COPY backend/requirements.txt /app/backend/
+# Copy everything from the root directory
+COPY . /app/
+
+# Install backend dependencies
 RUN pip install --no-cache-dir -r /app/backend/requirements.txt
 
-# Copy the entire backend code
-COPY backend /app/backend
-
-### ---- FRONTEND SETUP ---- ###
-# Copy frontend-related files (only what's needed)
-COPY package.json package-lock.json vite.config.ts tsconfig.json tailwind.config.js postcss.config.js ./
+# Set the working directory for frontend before installing dependencies
+WORKDIR /app
 
 # Install frontend dependencies
 RUN npm install
-
-# Copy frontend source code
-COPY src /app/src
 
 # Build the frontend for production
 RUN npm run build
@@ -32,4 +26,4 @@ RUN npm run build
 EXPOSE 8000 8501
 
 # Run backend and frontend properly
-CMD bash -c "python backend/scrape_articles.py && python backend/embed_articles.py && python backend/main.py & npx serve -s src/dist -l 8501"
+CMD ["bash", "-c", "python backend/scrape_articles.py && python backend/embed_articles.py && python backend/main.py & npx serve -s src/dist -l 8501"]
