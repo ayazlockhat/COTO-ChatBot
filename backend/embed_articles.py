@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+
 def scrape_articles_content():
     listing_url = (
         "https://www.coto.org/resources/?lang=en&view=grid&term=&resource-audience=&"
@@ -14,17 +15,16 @@ def scrape_articles_content():
     )
     links = get_article_links(listing_url)
     articles = []
-    print(f"Found {len(links)} article links.")
-    
-    for idx, link in enumerate(links):
-        print(f"Scraping article {idx + 1}/{len(links)}: {link}")
+
+    for link in links:
         try:
             article = scrape_article_content(link)
             articles.append(article)
-        except Exception as e:
-            print(f"Error scraping {link}: {e}")
-        time.sleep(1)
+        except Exception:
+            print(f"Failed to scrape article at {link}")
+        time.sleep(0.5)
     return articles
+
 
 articles = scrape_articles_content()
 
@@ -38,7 +38,6 @@ embedding_model = OpenAIEmbeddings(
 )
 
 client = chromadb.PersistentClient(path="./chroma_db")
-
 collection = client.get_or_create_collection(name="articles")
 
 documents = []
@@ -59,6 +58,4 @@ collection.add(
     metadatas=metadatas,
     ids=ids
 )
-
-print("Embeddings generated in batch and stored in ChromaDB!")
-
+print("Articles added to ChromaDB.")

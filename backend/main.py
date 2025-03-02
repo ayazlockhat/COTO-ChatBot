@@ -19,17 +19,16 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Initialize ChromaDB client
 client = chromadb.PersistentClient(path="./chroma_db")
 collection = client.get_collection(name="articles")
 
-# Initialize OpenAI client
 openai_client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
 
-# Define request/response models
+
 class Query(BaseModel):
     question: str
     top_k: Optional[int] = 3
+
 
 class Article(BaseModel):
     title: str
@@ -37,49 +36,47 @@ class Article(BaseModel):
     content: str
     relevance: float
 
+
 class ChatResponse(BaseModel):
     answer: str
     relevant_articles: List[Article]
 
+
 @app.post("/api/chat", response_model=ChatResponse)
 async def chat(query: Query):
     try:
-        # Generate embedding for the question
         embedding_response = openai_client.embeddings.create(
             model="text-embedding-3-small",
             input=query.question
         )
         question_embedding = embedding_response.data[0].embedding
-        
+
         # Query ChromaDB for relevant articles
         results = collection.query(
             query_embeddings=[question_embedding],
             n_results=query.top_k
         )
-        
+
         # Prepare context from relevant articles
         context_texts = []
         relevant_articles = []
-        
+
         for i in range(len(results['ids'][0])):
             article_id = results['ids'][0][i]
             article_content = results['documents'][0][i]
             metadata = results['metadatas'][0][i]
             distance = results['distances'][0][i]
-            
-            # Add to context with source marker
-            context_texts.append(f"[Source {i+1}: {metadata['title']} - {article_id}]\n{article_content}")
 
-            
-            # Add to relevant articles list
+            context_texts.append(
+                f"[Source {i+1}: {metadata['title']} - {article_id}]\n{article_content}")
+
             relevant_articles.append(Article(
                 title=metadata['title'],
                 url=article_id,
                 content=article_content[:200] + "...",
                 relevance=1 - distance
             ))
-        
-        # Combine context
+
         context = "\n\n".join(context_texts)
 
         system_message = (
@@ -92,7 +89,6 @@ async def chat(query: Query):
             "If you cannot find direct information, say you can't and provide the top 3 articles that could benefit the user."
         )
 
-        # Create message for ChatGPT
         messages = [
             {"role": "system", "content": system_message},
             {"role": "user", "content": f"""Here are the available articles:
@@ -103,22 +99,23 @@ async def chat(query: Query):
 Based on these articles, please answer this question:
 {query.question}"""}
         ]
-        
+
         chat_response = openai_client.chat.completions.create(
             model="gpt-4o-mini",
             messages=messages,
             temperature=0.0
         )
-        
+
         answer = chat_response.choices[0].message.content
-        
+
         return ChatResponse(
             answer=answer,
             relevant_articles=relevant_articles
         )
-    
+
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
 
 @app.get("/api/health")
 async def health_check():
