@@ -27,4 +27,4 @@ RUN npm run build
 EXPOSE 8000 8501
 
 # Run backend and frontend properly
-CMD ["bash", "-c", "python backend/scraper.py && python backend/embed_articles.py && python backend/main.py & npx serve -s dist -l 8501"]
+CMD ["bash", "-c", "python backend/scraper.py && python backend/embed_articles.py && python backend/main.py & npx serve -s /app/dist -l 8501 & wait"]
