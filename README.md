@@ -10,4 +10,10 @@ This project is a chatbot that answers user questions based on articles from the
 - **Backend:** FastAPI + LangChain  
 - **Scraping:** BeautifulSoup + Requests  
 - **Storage:** ChromaDB (Vector Database)  
-- **LLM:** OpenAI API (text-embedding and question-answering)  
+- **LLM:** OpenAI API (text-embedding and question-answering)
+
+---
+
+### **Images**
+![image](https://github.com/user-attachments/assets/d8e6f3fd-db79-4075-9967-bbb1be9908fc)
+
