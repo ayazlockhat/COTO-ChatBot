@@ -7,17 +7,18 @@ RUN apt-get update && apt-get install -y nodejs npm
 # Set the working directory inside the container
 WORKDIR /app
 
-# Copy everything from the root directory
-COPY . /app/
+# Copy only necessary files for dependency installation
+COPY package.json package-lock.json /app/
+COPY backend/requirements.txt /app/backend/
 
 # Install backend dependencies
 RUN pip install --no-cache-dir -r /app/backend/requirements.txt
 
-# Set the working directory for frontend before installing dependencies
-WORKDIR /app
-
 # Install frontend dependencies
 RUN npm install
+
+# Copy the rest of the project
+COPY . /app/
 
 # Build the frontend for production
 RUN npm run build
