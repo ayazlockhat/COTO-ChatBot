@@ -12,6 +12,7 @@ export function Chat() {
   const [messages, setMessages] = useState<message[]>([]);
   const [question, setQuestion] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [selectedModel, setSelectedModel] = useState<string>("gpt-4o-mini");
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
 
   async function handleSubmit(text?: string) {
@@ -29,7 +30,8 @@ export function Chat() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           question: messageText,
-          top_k: 3
+          top_k: 3,
+          model: selectedModel
         })
       });
   
@@ -42,7 +44,6 @@ export function Chat() {
         ...prev,
         { content: data.answer, role: "assistant", id: uuidv4() }
       ]);
-  
   
     } catch (error) {
       console.error("Error fetching response:", error);
@@ -57,7 +58,7 @@ export function Chat() {
 
   return (
     <div className="flex flex-col min-w-0 h-dvh bg-background">
-      <Header />
+      <Header selectedModel={selectedModel} onModelChange={setSelectedModel} />
       <div className="flex flex-col min-w-0 gap-6 flex-1 overflow-y-scroll pt-4" ref={messagesContainerRef}>
         {messages.length === 0 && <Overview />}
         {messages.map((message, index) => (
