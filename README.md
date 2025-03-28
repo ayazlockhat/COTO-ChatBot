@@ -7,7 +7,7 @@ This project is a chatbot that answers user questions based on articles from the
 
 ### **Tech Stack**
 - **Frontend:** React + Vite + TailwindCSS  
-- **Backend:** FastAPI + LangChain  
+- **Backend:** Python + FastAPI + LangChain  
 - **Scraping:** BeautifulSoup + Requests  
 - **Storage:** ChromaDB (Vector Database)  
 - **LLM:** OpenAI API - GPT-4o mini and text-embedding-ada-002
